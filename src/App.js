@@ -1,24 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
+/* global gapi */
+
+import React, { useState, useEffect } from 'react';
+import config from './config';
 import './App.css';
 
+
 function App() {
+  // const [isSignedIn, setStatus] = useState(false);
+
+  useEffect(() => {
+    window.gapi.load('auth2', () => {
+      window.gapi.auth2.init({
+        client_id: config.GOOGLE_CLIENT_ID,
+      }).then(() => {
+        window.gapi.signin2.render('my-signIn', {
+          scope: 'profile email',
+          width: 250,
+          height: 50,
+          longtitle: false,
+          theme: 'dark'
+        });
+      });
+    })
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div id="my-signIn" />
     </div>
   );
 }

@@ -1,0 +1,1 @@
+module.exports = { GOOGLE_CLIENT_ID: 'REPLACE WITH CLIENT ID' }
