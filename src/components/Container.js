@@ -4,28 +4,36 @@ import config from '../config';
 import { actions } from '../redux/ducks';
 
 function Container() {
-  const isSignedIn = useSelector(state => state.isSignedIn);
+  const isSignedIn = useSelector(state => state.authInstance.isSignedIn);
   const dispatch = useDispatch();
 
+  const processToken = () => {
+    const authInstance = window.gapi.auth2.getAuthInstance();
+    dispatch(actions.authInstance.changeStatus(authInstance.isSignedIn.je));
+    dispatch(actions.authInstance.changeUserID(authInstance.currentUser.je.Ca));
+    dispatch(actions.authInstance.changeAccessToken(authInstance.currentUser.je.tc));
+  }
+
   useEffect(() => {
-    window.gapi.load('auth2', () => {
-      window.gapi.auth2.init({
+    window.gapi.load('client:auth2', () => {
+      window.gapi.client.init({
         client_id: config.GOOGLE_CLIENT_ID,
+        scope: 'profile'
       }).then(() => {
         window.gapi.signin2.render('my-signIn', {
-          scope: 'profile email',
+          scope: 'profile',
           width: 250,
           height: 50,
           longtitle: false,
           theme: 'dark',
-          onsuccess: () => dispatch(actions.changeStatus(true))
+          onsuccess: () => processToken()
         });
       });
-    })
-  }, [dispatch]);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const renderPage = () => {
-    console.log(isSignedIn);
     if (isSignedIn) {
       return (<div>You are signed in! (:</div>);
     } else {
