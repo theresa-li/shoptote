@@ -5,6 +5,7 @@ import { actions } from '../redux/ducks';
 
 function Container() {
   const isSignedIn = useSelector(state => state.authInstance.isSignedIn);
+  const content = useSelector(state => state.content);
   const dispatch = useDispatch();
 
   const processToken = () => {
@@ -26,16 +27,26 @@ function Container() {
           height: 50,
           longtitle: false,
           theme: 'dark',
-          onsuccess: () => processToken()
+          onsuccess: () => {
+            processToken();
+            const fetchContent = async() => {
+              fetch('http://localhost:3001/api/getContent')
+                .then(res => res.json())
+                .then(body => dispatch(actions.api.changeContent(body.content)));     
+            }
+            fetchContent();
+          }
         });
       });
     });
+
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const renderPage = () => {
-    if (isSignedIn) {
-      return (<div>You are signed in! (:</div>);
+    if (isSignedIn) {      
+      return (<div>You are signed in! (: { content }</div>);
     } else {
       return <div id="my-signIn" />;
     }
