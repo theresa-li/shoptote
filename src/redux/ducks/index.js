@@ -1,20 +1,12 @@
 export const actionTypes = {
-  authInstance: {
-    CHANGE_STATUS: 'CHANGE_STATUS',
-    CHANGE_USER_ID: 'CHANGE_USER_ID',
-    CHANGE_ACCESS_TOKEN: 'CHANGE_ACCESS_TOKEN',
-  },
+  CHANGE_INSTANCE: 'CHANGE_INSTANCE',
   api: {
     CHANGE_CONTENT: 'CHANGE_CONTENT'
   }
 };
 
 export const actions = {
-  authInstance: {
-    changeStatus: status => ({ type: actionTypes.authInstance.CHANGE_STATUS, payload: status }),
-    changeAccessToken: token => ({ type: actionTypes.authInstance.CHANGE_ACCESS_TOKEN, payload: token }),
-    changeUserID: id => ({ type: actionTypes.authInstance.CHANGE_USER_ID, payload: id })
-  },
+  changeInstance: instance => ({ type: actionTypes.CHANGE_INSTANCE, payload: instance }),
   api: {
     changeContent: content => ({ type: actionTypes.api.CHANGE_CONTENT, payload: content })
   }
@@ -23,22 +15,18 @@ export const actions = {
 const initialState = {
   authInstance: {
     isSignedIn: false,
-    accessToken: '',
-    userID: ''
+    accessToken: null,
+    userID: null
   },
-  content: ''
+  content: null
 };
 
 export const rootReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'CHANGE_STATUS':
-      state.authInstance.isSignedIn = action.payload;
-      return state;
-    case 'CHANGE_USER_ID':
-      state.authInstance.userID = action.payload;
-      return state;
-    case 'CHANGE_ACCESS_TOKEN':
-      state.authInstance.accessToken = action.payload;
+    case 'CHANGE_INSTANCE': 
+      state.authInstance.isSignedIn = action.payload.status;
+      state.authInstance.userID = action.payload.userID;
+      state.authInstance.accessToken = action.payload.accessToken;
       return state;
     case 'CHANGE_CONTENT':
       state.content = action.payload;

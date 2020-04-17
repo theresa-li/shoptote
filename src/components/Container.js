@@ -5,14 +5,24 @@ import { actions } from '../redux/ducks';
 
 function Container() {
   const isSignedIn = useSelector(state => state.authInstance.isSignedIn);
+  const accessToken = useSelector(state => state.authInstance.accessToken);
+  const userID = useSelector(state => state.authInstance.userID);
   const content = useSelector(state => state.content);
   const dispatch = useDispatch();
 
   const processToken = () => {
     const authInstance = window.gapi.auth2.getAuthInstance();
-    dispatch(actions.authInstance.changeStatus(authInstance.isSignedIn.je));
-    dispatch(actions.authInstance.changeUserID(authInstance.currentUser.je.Ca));
-    dispatch(actions.authInstance.changeAccessToken(authInstance.currentUser.je.tc));
+    dispatch(actions.changeInstance({
+      status: authInstance.isSignedIn.je,
+      accessToken: authInstance.currentUser.je.tc.access_token,
+      userID: authInstance.currentUser.je.Ca
+    }));
+  }
+
+  const fetchContent = async() => {
+    fetch(`http://localhost:3001/api/getContent/${ userID }/${ accessToken }`)
+      .then(res => res.json())
+      .then(body => dispatch(actions.api.changeContent(body.content)));
   }
 
   useEffect(() => {
@@ -28,24 +38,23 @@ function Container() {
           longtitle: false,
           theme: 'dark',
           onsuccess: () => {
-            processToken();
-            const fetchContent = async() => {
-              fetch('http://localhost:3001/api/getContent')
-                .then(res => res.json())
-                .then(body => dispatch(actions.api.changeContent(body.content)));     
-            }
-            fetchContent();
+            processToken();          
           }
         });
       });
     });
-
     
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (isSignedIn) {
+      fetchContent();
+    }    
+  })
+
   const renderPage = () => {
-    if (isSignedIn) {      
+    if (isSignedIn) {
       return (<div>You are signed in! (: { content }</div>);
     } else {
       return <div id="my-signIn" />;
